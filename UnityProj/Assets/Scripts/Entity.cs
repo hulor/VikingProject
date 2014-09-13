@@ -7,6 +7,16 @@ using System.Collections;
 public class Entity : MonoBehaviour
 {
     /// <summary>
+    ///     Handler for die event.
+    /// </summary>
+    public delegate void DieHandler();
+
+    /// <summary>
+    ///     Event thrown when entity dies.
+    /// </summary>
+    public event DieHandler dieEvent;
+
+    /// <summary>
     ///     Max HP.
     /// </summary>
     public float hpTotal = 50.0f;
@@ -43,12 +53,18 @@ public class Entity : MonoBehaviour
 
         if (this._hp == 0.0f)
         {
-            this.SendMessage("EntityDie", SendMessageOptions.DontRequireReceiver);
+            this.Kill();
             return (true);
         }
         else
             return (false);
     }
 
-
+    public virtual void Kill()
+    {
+        //this.SendMessage("EntityDie", SendMessageOptions.DontRequireReceiver);
+        if (this.dieEvent != null)
+            this.dieEvent();
+        GameObject.Destroy(this.gameObject);
+    }
 }

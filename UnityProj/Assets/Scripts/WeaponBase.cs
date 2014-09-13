@@ -24,13 +24,53 @@ public class WeaponBase : MonoBehaviour
     /// </summary>
     private List<ShrineBase> _shrines = new List<ShrineBase>();
 
+    private List<Entity> _targets = new List<Entity>();
 
-    public void Attack(Entity target)
+
+    private void Start()
     {
+        this._lastHitTime = Time.time - this.speedAttack;
+    }
+
+    /// <summary>
+    ///     Use weapon on an entity.
+    /// </summary>
+    /// <param name="target">
+    ///     Entity hitten by weapon.
+    /// </param>
+    public void Attack()
+    {
+        //List<Entity> target = new List<Entity>();
+
+        //this.GetTarget(target);
         if ((Time.time - this._lastHitTime) < this.speedAttack)
         {
             return;
         }
-        target.DealDamage(this.hit * -1.0f);
+        this._lastHitTime = Time.time;
+        List<Entity> newTargets = new List<Entity>(this._targets);
+
+        for (int i = 0, size = this._targets.Count; i < size; ++i)
+        {
+            if (this._targets[i].DealDamage(this.hit * -1.0f) == true)
+                newTargets.Remove(this._targets[i]);
+        }
+        this._targets = newTargets;
+    }
+
+    protected virtual void OnTriggerEnter(Collider col)
+    {
+        Entity target = col.GetComponentInChildren<Entity>();
+
+        if (target != null)
+            this._targets.Add(target);
+    }
+
+    protected virtual void OnTriggerExit(Collider col)
+    {
+        Entity target = col.GetComponentInChildren<Entity>();
+
+        if (target != null)
+            this._targets.Remove(target);
     }
 }
