@@ -60,6 +60,8 @@ public class WeaponBase : MonoBehaviour
 
     protected virtual void OnTriggerEnter(Collider col)
     {
+        if (col.isTrigger == true)
+            return ;
         Entity target = col.GetComponentInChildren<Entity>();
 
         if (target != null)
@@ -68,6 +70,8 @@ public class WeaponBase : MonoBehaviour
 
     protected virtual void OnTriggerExit(Collider col)
     {
+        if (col.isTrigger == true)
+            return;
         Entity target = col.GetComponentInChildren<Entity>();
 
         if (target != null)
