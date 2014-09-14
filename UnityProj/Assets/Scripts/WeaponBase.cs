@@ -24,6 +24,9 @@ public class WeaponBase : MonoBehaviour
     /// </summary>
     private List<ShrineBase> _shrines = new List<ShrineBase>();
 
+    /// <summary>
+    ///     Entity contained in collider.
+    /// </summary>
     private List<Entity> _targets = new List<Entity>();
 
 
