@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+///     Die event base script. Override OnDie to do some stuff when binded entity dies.
+/// </summary>
 public abstract class OnDieEvent : MonoBehaviour
 {
     protected virtual void Start()

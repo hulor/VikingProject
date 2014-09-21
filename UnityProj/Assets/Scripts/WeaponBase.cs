@@ -7,7 +7,7 @@ public class WeaponBase : MonoBehaviour
     /// <summary>
     ///     How much weapon hurts.
     /// </summary>
-    public float hit = 10.0f;
+    public float hit = -10.0f;
 
     /// <summary>
     ///     Weapon attack speed.
@@ -15,14 +15,20 @@ public class WeaponBase : MonoBehaviour
     public float speedAttack = 1.0f;
 
     /// <summary>
+    ///     Weapon mesh.
+    /// </summary>
+    public GameObject mesh;
+
+    /// <summary>
+    ///     Entity carrying weapon.
+    /// </summary>
+    public ShrineManager shrineManager;
+
+    /// <summary>
     ///     Time when last attack was thrown.
     /// </summary>
     private float _lastHitTime = 0.0f;
 
-    /// <summary>
-    ///     All shrine applied to weapon.
-    /// </summary>
-    private List<ShrineBase> _shrines = new List<ShrineBase>();
 
     /// <summary>
     ///     Entity contained in collider.
@@ -41,7 +47,7 @@ public class WeaponBase : MonoBehaviour
     /// <param name="target">
     ///     Entity hitten by weapon.
     /// </param>
-    public void Attack()
+    public virtual void Attack()
     {
         //List<Entity> target = new List<Entity>();
 
@@ -52,18 +58,33 @@ public class WeaponBase : MonoBehaviour
         }
         this._lastHitTime = Time.time;
         List<Entity> newTargets = new List<Entity>(this._targets);
+        float damage = this.hit;
+
+        for (int i = 0, size = this.shrineManager.shrines.Count; i < size; ++i)
+        {
+            this.shrineManager.shrines[i].ApplyDamageEffect(ref damage);
+            this.shrineManager.shrines[i].ShowVisualEffect(this.transform.position, this.transform.rotation);
+        }
 
         for (int i = 0, size = this._targets.Count; i < size; ++i)
         {
-            if (this._targets[i].DealDamage(this.hit * -1.0f) == true)
+            for (int j = 0, sizeJ = this.shrineManager.shrines.Count; j < sizeJ; ++j)
+                this.shrineManager.shrines[i].ApplyEntityEffect(this._targets[i]);
+            if (this._targets[i].DealDamage(damage) == true)
                 newTargets.Remove(this._targets[i]);
+        }
+        if (this._targets.Count > 0)
+        {
+            for (int i = 0, size = this.shrineManager.shrines.Count; i < size; ++i)
+                this.shrineManager.shrines[i].UseCharge();
         }
         this._targets = newTargets;
     }
 
     protected virtual void OnTriggerEnter(Collider col)
     {
-        if (col.isTrigger == true)
+        if (col.isTrigger == true ||
+            this.transform.IsChildOf(col.transform) == true)
             return ;
         Entity target = col.GetComponentInChildren<Entity>();
 
