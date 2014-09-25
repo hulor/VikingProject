@@ -15,7 +15,9 @@ public class WeaponManager : MonoBehaviour
     {
         if (Input.GetButtonUp("Fire1") == true)
         {
-            this.weapon.Attack();
+            this.weapon.Attack(false);
         }
+        else if (Input.GetButtonUp("Fire2") == true)
+            this.weapon.Attack(true);
     }
 }

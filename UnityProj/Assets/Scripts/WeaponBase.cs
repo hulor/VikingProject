@@ -10,9 +10,19 @@ public class WeaponBase : MonoBehaviour
     public float hit = -10.0f;
 
     /// <summary>
+    ///     How much weapon hurts on huge attack.
+    /// </summary>
+    public float hitFuriousAttack = -20.0f;
+
+    /// <summary>
     ///     Weapon attack speed.
     /// </summary>
     public float speedAttack = 1.0f;
+
+    /// <summary>
+    ///     Time to wait after a furious attack.
+    /// </summary>
+    public float speedFuriousAttack = 1.5f;
 
     /// <summary>
     ///     Weapon mesh.
@@ -29,6 +39,8 @@ public class WeaponBase : MonoBehaviour
     /// </summary>
     private float _lastHitTime = 0.0f;
 
+    private float _timeToWait = 0.0f;
+
 
     /// <summary>
     ///     Entity contained in collider.
@@ -44,21 +56,33 @@ public class WeaponBase : MonoBehaviour
     /// <summary>
     ///     Use weapon on an entity.
     /// </summary>
-    /// <param name="target">
-    ///     Entity hitten by weapon.
+    /// <param name="furious">
+    ///     Does the attack is a Furious attack?
     /// </param>
-    public virtual void Attack()
+    public virtual void Attack(bool furious)
     {
-        //List<Entity> target = new List<Entity>();
+        if (furious == true)
+            this.HitEnemy(this.speedFuriousAttack, this.hitFuriousAttack);
+        else
+            this.HitEnemy(this.speedAttack, this.hit);
+    }
 
-        //this.GetTarget(target);
-        if ((Time.time - this._lastHitTime) < this.speedAttack)
+    /// <summary>
+    ///     Hit enemies with specific speed and damage.
+    /// </summary>
+    /// <param name="speedAttack">
+    ///     Speed of attack
+    /// </param>
+    /// <param name="damage"></param>
+    protected void HitEnemy(float speedAttack, float damage)
+    {
+        if ((Time.time - this._lastHitTime) < this._timeToWait)
         {
             return;
         }
         this._lastHitTime = Time.time;
+        this._timeToWait = speedAttack;
         List<Entity> newTargets = new List<Entity>(this._targets);
-        float damage = this.hit;
 
         for (int i = 0, size = this.shrineManager.shrines.Count; i < size; ++i)
         {
