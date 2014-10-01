@@ -11,6 +11,8 @@ public class FightController : MonoBehaviour
     private void Update()
     {
         if (Input.GetButtonUp("Fire1") == true)
-            weapon.Attack();
+            weapon.Attack(false);
+        else if (Input.GetButtonUp("Fire2") == true)
+            weapon.Attack(true);
     }
 }
