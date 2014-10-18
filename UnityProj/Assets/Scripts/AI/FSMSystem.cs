@@ -77,7 +77,7 @@ namespace FSM
             }
             if (idParent != this._statStack.Count)
             {
-                this.ParentKillChildren(parent);
+                this.ParentKillChildren(idParent);
             }
             this._statStack.Add(childType);
             this._stats[childType].OnStatEnter();
