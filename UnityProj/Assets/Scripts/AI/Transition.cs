@@ -6,6 +6,7 @@ namespace FSM
     public enum eTransition
     {
         NoTransition = 0, //should never be fired
+        EnemyInTrigger = 1,
     }
 
     public struct TransitionInfo
@@ -19,7 +20,11 @@ namespace FSM
             /// <summary>
             ///     Stat will kill himself and transition to idDest.
             /// </summary>
-            SimpleTransition = 1
+            SimpleTransition = 1,
+            /// <summary>
+            ///     Should never be set.
+            /// </summary>
+            NoneTransition
         };
 
         /// <summary>
@@ -30,22 +35,49 @@ namespace FSM
         /// <summary>
         ///     Destination stat.
         /// </summary>
-        public eStatId idDest;
+        public eStateId idDest;
 
         /// <summary>
         ///     transition type.
         /// </summary>
         public eTransition transition;
 
-        public TransitionInfo(eTransitionType type, eStatId dest, eTransition transition)
+        public TransitionData data;
+
+        private delegate void TransitionHandler(FSMSystem sys, FSMState state);
+
+        private TransitionHandler[] _transitions;
+
+        public TransitionInfo(eTransitionType type, eStateId dest, eTransition transition, TransitionData tData)
         {
             this.transitionType = type;
             this.idDest = dest;
             this.transition = transition;
+            this.data = tData;
+            this._transitions = new TransitionHandler[(int)eTransitionType.NoneTransition];
+            this._transitions[(int)eTransitionType.AddChild] = this.AddTransition;
+            this._transitions[(int)eTransitionType.SimpleTransition] = this.SwitchStateTransition;
+        }
+
+        public void PerformTransition(FSMSystem fsm, FSMState state)
+        {
+            if (this.transitionType == eTransitionType.NoneTransition)
+                return;
+            this._transitions[(int)this.transitionType](fsm, state);
+        }
+
+        private void AddTransition(FSMSystem fsm, FSMState state)
+        {
+            fsm.StatAddChild(state, this.idDest, this.data);
+        }
+
+        private void SwitchStateTransition(FSMSystem fsm, FSMState state)
+        {
+            fsm.StatTransitTo(state, this.idDest, this.data);
         }
     }
 
-    public struct TransitionData
+    public class TransitionData
     {
         public eTransition transition;
         public Object data;
